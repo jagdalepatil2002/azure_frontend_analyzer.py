@@ -176,7 +176,7 @@ const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, se
         { name: "Guatemala", code: "GT", dial_code: "+502" },
         { name: "El Salvador", code: "SV", dial_code: "+503" },
         { name: "Honduras", code: "HN", dial_code: "+504" },
-        { name: "Nicaragua", code: "NI", dial_code: "+505" }, // THIS LINE IS NOW FIXED
+        { name: "Nicaragua", code: "NI", dial_code: "+505" },
         { name: "Costa Rica", code: "CR", dial_code: "+506" },
         { name: "Panama", code: "PA", dial_code: "+507" },
         { name: "Haiti", code: "HT", dial_code: "+509" },
@@ -300,13 +300,16 @@ const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, se
     </div>
     )
 };
-const UploadScreen = ({ handleLogout, handleFileUpload }) => {
+
+// CORRECTED: Added 'user' prop to the function definition
+const UploadScreen = ({ user, handleLogout, handleFileUpload }) => {
     const handleDragOver = (e) => e.preventDefault();
     const handleDrop = (e) => { e.preventDefault(); if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]); };
     const handleFileSelect = (e) => { if (e.target.files.length > 0) handleFileUpload(e.target.files[0]); };
     return (
         <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-lg border border-gray-100 max-w-2xl w-full" style={{ backgroundColor: '#F9F5FF' }}>
-            <div className="flex justify-between items-center mb-6"> <h2 className="text-3xl font-bold text-purple-800">Tax Helper</h2> <button onClick={handleLogout} className="text-purple-600 hover:text-purple-800 font-semibold">Sign Out</button> </div>
+            {/* CORRECTED: Changed h2 to display a welcome message using the 'user' prop */}
+            <div className="flex justify-between items-center mb-6"> <h2 className="text-3xl font-bold text-purple-800">Welcome, {user?.firstName}!</h2> <button onClick={handleLogout} className="text-purple-600 hover:text-purple-800 font-semibold">Sign Out</button> </div>
             <p className="text-purple-600 mb-8">Don't stress! Just upload your notice and we'll make sense of it for you.</p>
             <div className="border-2 border-dashed border-purple-300 rounded-xl p-12 text-center bg-purple-50 cursor-pointer hover:bg-purple-100 transition-colors" onDragOver={handleDragOver} onDrop={handleDrop} onClick={() => document.getElementById('file-input').click()}>
                 <FileHeart className="mx-auto h-16 w-16 text-purple-400" />
@@ -494,7 +497,10 @@ export default function App() {
         switch (view) {
             case 'register': return <AuthScreen isLogin={false} handleRegister={handleRegister} error={error} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} email={email} setEmail={setEmail} password={password} setPassword={setPassword} confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword} dob={dob} setDob={setDob} mobileNumber={mobileNumber} setMobileNumber={setMobileNumber} countryCode={countryCode} setCountryCode={setCountryCode} setView={setView} clearFormFields={clearFormFields} />;
             case 'login': return <AuthScreen isLogin={true} handleLogin={handleLogin} error={error} email={email} setEmail={setEmail} password={password} setPassword={setPassword} setView={setView} clearFormFields={clearFormFields} />;
-            case 'upload': return <UploadScreen handleLogout={handleLogout} handleFileUpload={handleFileUpload} />;
+            
+            // CORRECTED: Pass the 'user' object to the UploadScreen component
+            case 'upload': return <UploadScreen user={user} handleLogout={handleLogout} handleFileUpload={handleFileUpload} />;
+            
             case 'analyzing': return <LoadingSpinner />;
             case 'summary': return <SummaryScreen summaryData={summaryData} resetApp={resetApp} />;
             default: return <div className="text-purple-500">Loading...</div>;
