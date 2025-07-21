@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const API_BASE_URL = '[https://tax-analyzer-backend.onrender.com](https://tax-analyzer-backend.onrender.com)'; 
+// FIX: The URL should be a simple string without markdown formatting.
+const API_BASE_URL = 'https://tax-analyzer-backend.onrender.com';
 
 const api = {
   async register(payload) {
@@ -31,7 +32,7 @@ const api = {
 };
 
 // --- Helper Components & Icons ---
-const FileHeart = (props) => ( <svg {...props} xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" /><path d="M14 2v6h6" /><path d="M10.3 12.3c.8-1 2-1.5 3.2-1.5 2.2 0 4 1.8 4 4 0 2.5-3.4 4.9-5.2 6.2a.5.5 0 0 1-.6 0C10 19.4 6 17 6 14.5c0-2.2 1.8-4 4-4 .8 0 1.5.3 2.1.8" /></svg> );
+const FileHeart = (props) => ( <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" /><path d="M14 2v6h6" /><path d="M10.3 12.3c.8-1 2-1.5 3.2-1.5 2.2 0 4 1.8 4 4 0 2.5-3.4 4.9-5.2 6.2a.5.5 0 0 1-.6 0C10 19.4 6 17 6 14.5c0-2.2 1.8-4 4-4 .8 0 1.5.3 2.1.8" /></svg> );
 const LoadingSpinner = () => ( <div className="flex flex-col items-center justify-center space-y-4"><div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div><p className="text-purple-700 font-semibold">AI Analyzing your notice...</p></div> );
 
 // --- Screen Components ---
@@ -174,7 +175,7 @@ const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, se
         { name: "Guatemala", code: "GT", dial_code: "+502" },
         { name: "El Salvador", code: "SV", dial_code: "+503" },
         { name: "Honduras", code: "HN", dial_code: "+504" },
-        { name: "Nicaragua", code: "NI", dial_code: "+505" },
+        { name.code: "NI", dial_code: "+505" },
         { name: "Costa Rica", code: "CR", dial_code: "+506" },
         { name: "Panama", code: "PA", dial_code: "+507" },
         { name: "Haiti", code: "HT", dial_code: "+509" },
@@ -262,7 +263,7 @@ const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, se
                                 className="w-full h-full bg-gray-50 border-2 border-r-0 border-purple-200 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-purple-500 px-3 py-3 text-gray-700 flex justify-between items-center"
                             >
                                 <span>{countryCode}</span>
-                                <svg className="fill-current h-4 w-4" xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                             </button>
                             {isDropdownOpen && (
                                 <ul className="absolute z-10 mt-1 w-max max-h-60 bg-white border border-gray-300 rounded-md shadow-lg overflow-auto">
