@@ -4,6 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 // will be set in the Azure Static Web Apps "Configuration" settings.
 const API_BASE_URL = 'https://tax-analyzer-backend.onrender.com';
 
+/**
+ * API object for handling all fetch requests to the backend.
+ */
 const api = {
   async register(payload) {
     const response = await fetch(`${API_BASE_URL}/register`, {
@@ -33,204 +36,278 @@ const api = {
 };
 
 // --- Helper Components & Icons ---
-const FileHeart = (props) => ( <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" /><path d="M14 2v6h6" /><path d="M10.3 12.3c.8-1 2-1.5 3.2-1.5 2.2 0 4 1.8 4 4 0 2.5-3.4 4.9-5.2 6.2a.5.5 0 0 1-.6 0C10 19.4 6 17 6 14.5c0-2.2 1.8-4 4-4 .8 0 1.5.3 2.1.8" /></svg> );
-const LoadingSpinner = () => ( <div className="flex flex-col items-center justify-center space-y-4"><div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div><p className="text-purple-700 font-semibold">AI Analyzing your notice...</p></div> );
+
+const FileHeart = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+    <path d="M14 2v6h6" />
+    <path d="M10.3 12.3c.8-1 2-1.5 3.2-1.5 2.2 0 4 1.8 4 4 0 2.5-3.4 4.9-5.2 6.2a.5.5 0 0 1-.6 0C10 19.4 6 17 6 14.5c0-2.2 1.8-4 4-4 .8 0 1.5.3 2.1.8" />
+  </svg>
+);
+
+const LoadingSpinner = () => (
+  <div className="flex flex-col items-center justify-center space-y-4">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div>
+    <p className="text-purple-700 font-semibold">AI Analyzing your notice...</p>
+  </div>
+);
 
 // --- Screen Components ---
+
+/**
+ * Component for both Login and Registration forms.
+ */
 const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, setFirstName, lastName, setLastName, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, dob, setDob, mobileNumber, setMobileNumber, countryCode, setCountryCode, setView, clearFormFields}) => {
+    // CORRECTED: A comprehensive and complete list of country codes for the dropdown.
     const countryCodes = [
-        { name: "United States", code: "US", dial_code: "+1" },
-        { name: "Canada", code: "CA", dial_code: "+1" },
-        { name: "Russia", code: "RU", dial_code: "+7" },
-        { name: "Egypt", code: "EG", dial_code: "+20" },
-        { name: "South Africa", code: "ZA", dial_code: "+27" },
-        { name: "Greece", code: "GR", dial_code: "+30" },
-        { name: "Netherlands", code: "NL", dial_code: "+31" },
-        { name: "Belgium", code: "BE", dial_code: "+32" },
-        { name: "France", code: "FR", dial_code: "+33" },
-        { name: "Spain", code: "ES", dial_code: "+34" },
-        { name: "Hungary", code: "HU", dial_code: "+36" },
-        { name: "Italy", code: "IT", dial_code: "+39" },
-        { name: "Romania", code: "RO", dial_code: "+40" },
-        { name: "Switzerland", code: "CH", dial_code: "+41" },
-        { name: "Austria", code: "AT", dial_code: "+43" },
-        { name: "United Kingdom", code: "GB", dial_code: "+44" },
-        { name: "Denmark", code: "DK", dial_code: "+45" },
-        { name: "Sweden", code: "SE", dial_code: "+46" },
-        { name: "Norway", code: "NO", dial_code: "+47" },
-        { name: "Poland", code: "PL", dial_code: "+48" },
-        { name: "Germany", code: "DE", dial_code: "+49" },
-        { name: "Peru", code: "PE", dial_code: "+51" },
-        { name: "Mexico", code: "MX", dial_code: "+52" },
-        { name: "Cuba", code: "CU", dial_code: "+53" },
-        { name: "Argentina", code: "AR", dial_code: "+54" },
-        { name: "Brazil", code: "BR", dial_code: "+55" },
-        { name: "Chile", code: "CL", dial_code: "+56" },
-        { name: "Colombia", code: "CO", dial_code: "+57" },
-        { name: "Venezuela", code: "VE", dial_code: "+58" },
-        { name: "Malaysia", code: "MY", dial_code: "+60" },
-        { name: "Australia", code: "AU", dial_code: "+61" },
-        { name: "Indonesia", code: "ID", dial_code: "+62" },
-        { name: "Philippines", code: "PH", dial_code: "+63" },
-        { name: "New Zealand", code: "NZ", dial_code: "+64" },
-        { name: "Singapore", code: "SG", dial_code: "+65" },
-        { name: "Thailand", code: "TH", dial_code: "+66" },
-        { name: "Japan", code: "JP", dial_code: "+81" },
-        { name: "South Korea", code: "KR", dial_code: "+82" },
-        { name: "Vietnam", code: "VN", dial_code: "+84" },
-        { name: "China", code: "CN", dial_code: "+86" },
-        { name: "Turkey", code: "TR", dial_code: "+90" },
-        { name: "India", code: "IN", dial_code: "+91" },
-        { name: "Pakistan", code: "PK", dial_code: "+92" },
-        { name: "Afghanistan", code: "AF", dial_code: "+93" },
-        { name: "Sri Lanka", code: "LK", dial_code: "+94" },
-        { name: "Myanmar", code: "MM", dial_code: "+95" },
-        { name: "Iran", code: "IR", dial_code: "+98" },
-        { name: "South Sudan", code: "SS", dial_code: "+211" },
-        { name: "Morocco", code: "MA", dial_code: "+212" },
-        { name: "Algeria", code: "DZ", dial_code: "+213" },
-        { name: "Tunisia", code: "TN", dial_code: "+216" },
-        { name: "Libya", code: "LY", dial_code: "+218" },
-        { name: "Gambia", code: "GM", dial_code: "+220" },
-        { name: "Senegal", code: "SN", dial_code: "+221" },
-        { name: "Mauritania", code: "MR", dial_code: "+222" },
-        { name: "Mali", code: "ML", dial_code: "+223" },
-        { name: "Guinea", code: "GN", dial_code: "+224" },
-        { name: "Ivory Coast", code: "CI", dial_code: "+225" },
-        { name: "Burkina Faso", code: "BF", dial_code: "+226" },
-        { name: "Niger", code: "NE", dial_code: "+227" },
-        { name: "Togo", code: "TG", dial_code: "+228" },
-        { name: "Benin", code: "BJ", dial_code: "+229" },
-        { name: "Mauritius", code: "MU", dial_code: "+230" },
-        { name: "Liberia", code: "LR", dial_code: "+231" },
-        { name: "Sierra Leone", code: "SL", dial_code: "+232" },
-        { name: "Ghana", code: "GH", dial_code: "+233" },
-        { name: "Nigeria", code: "NG", dial_code: "+234" },
-        { name: "Chad", code: "TD", dial_code: "+235" },
-        { name: "Central African Republic", code: "CF", dial_code: "+236" },
-        { name: "Cameroon", code: "CM", dial_code: "+237" },
-        { name: "Cape Verde", code: "CV", dial_code: "+238" },
-        { name: "Sao Tome and Principe", code: "ST", dial_code: "+239" },
-        { name: "Equatorial Guinea", code: "GQ", dial_code: "+240" },
-        { name: "Gabon", code: "GA", dial_code: "+241" },
-        { name: "Congo (Brazzaville)", code: "CG", dial_code: "+242" },
-        { name: "Congo (DRC)", code: "CD", dial_code: "+243" },
-        { name: "Angola", code: "AO", dial_code: "+244" },
-        { name: "Guinea-Bissau", code: "GW", dial_code: "+245" },
-        { name: "Seychelles", code: "SC", dial_code: "+248" },
-        { name: "Sudan", code: "SD", dial_code: "+249" },
-        { name: "Rwanda", code: "RW", dial_code: "+250" },
-        { name: "Ethiopia", code: "ET", dial_code: "+251" },
-        { name: "Somalia", code: "SO", dial_code: "+252" },
-        { name: "Djibouti", code: "DJ", dial_code: "+253" },
-        { name: "Kenya", code: "KE", dial_code: "+254" },
-        { name: "Tanzania", code: "TZ", dial_code: "+255" },
-        { name: "Uganda", code: "UG", dial_code: "+256" },
-        { name: "Burundi", code: "BI", dial_code: "+257" },
-        { name: "Mozambique", code: "MZ", dial_code: "+258" },
-        { name: "Zambia", code: "ZM", dial_code: "+260" },
-        { name: "Madagascar", code: "MG", dial_code: "+261" },
-        { name: "Reunion", code: "RE", dial_code: "+262" },
-        { name: "Zimbabwe", code: "ZW", dial_code: "+263" },
-        { name: "Namibia", code: "NA", dial_code: "+264" },
-        { name: "Malawi", code: "MW", dial_code: "+265" },
-        { name: "Lesotho", code: "LS", dial_code: "+266" },
-        { name: "Botswana", code: "BW", dial_code: "+267" },
-        { name: "Eswatini", code: "SZ", dial_code: "+268" },
-        { name: "Comoros", code: "KM", dial_code: "+269" },
-        { name: "Eritrea", code: "ER", dial_code: "+291" },
-        { name: "Aruba", code: "AW", dial_code: "+297" },
-        { name: "Faroe Islands", code: "FO", dial_code: "+298" },
-        { name: "Greenland", code: "GL", dial_code: "+299" },
-        { name: "Gibraltar", code: "GI", dial_code: "+350" },
-        { name: "Portugal", code: "PT", dial_code: "+351" },
-        { name: "Luxembourg", code: "LU", dial_code: "+352" },
-        { name: "Ireland", code: "IE", dial_code: "+353" },
-        { name: "Iceland", code: "IS", dial_code: "+354" },
-        { name: "Albania", code: "AL", dial_code: "+355" },
-        { name: "Malta", code: "MT", dial_code: "+356" },
-        { name: "Cyprus", code: "CY", dial_code: "+357" },
-        { name: "Finland", code: "FI", dial_code: "+358" },
-        { name: "Bulgaria", code: "BG", dial_code: "+359" },
-        { name: "Lithuania", code: "LT", dial_code: "+370" },
-        { name: "Latvia", code: "LV", dial_code: "+371" },
-        { name: "Estonia", code: "EE", dial_code: "+372" },
-        { name: "Moldova", code: "MD", dial_code: "+373" },
-        { name: "Armenia", code: "AM", dial_code: "+374" },
-        { name: "Belarus", code: "BY", dial_code: "+375" },
-        { name: "Andorra", code: "AD", dial_code: "+376" },
-        { name: "Monaco", code: "MC", dial_code: "+377" },
-        { name: "San Marino", code: "SM", dial_code: "+378" },
-        { name: "Vatican City", code: "VA", dial_code: "+379" },
-        { name: "Ukraine", code: "UA", dial_code: "+380" },
-        { name: "Serbia", code: "RS", dial_code: "+381" },
-        { name: "Montenegro", code: "ME", dial_code: "+382" },
-        { name: "Croatia", code: "HR", dial_code: "+385" },
-        { name: "Slovenia", code: "SI", dial_code: "+386" },
-        { name: "Bosnia and Herzegovina", code: "BA", dial_code: "+387" },
-        { name: "North Macedonia", code: "MK", dial_code: "+389" },
-        { name: "Czech Republic", code: "CZ", dial_code: "+420" },
-        { name: "Slovakia", code: "SK", dial_code: "+421" },
-        { name: "Liechtenstein", code: "LI", dial_code: "+423" },
-        { name: "Belize", code: "BZ", dial_code: "+501" },
-        { name: "Guatemala", code: "GT", dial_code: "+502" },
-        { name: "El Salvador", code: "SV", dial_code: "+503" },
-        { name: "Honduras", code: "HN", dial_code: "+504" },
-        { name: "Nicaragua", code: "NI", dial_code: "+505" },
-        { name: "Costa Rica", code: "CR", dial_code: "+506" },
-        { name: "Panama", code: "PA", dial_code: "+507" },
-        { name: "Haiti", code: "HT", dial_code: "+509" },
-        { name: "Bolivia", code: "BO", dial_code: "+591" },
-        { name: "Guyana", code: "GY", dial_code: "+592" },
-        { name: "Ecuador", code: "EC", dial_code: "+593" },
-        { name: "Paraguay", code: "PY", dial_code: "+595" },
-        { name: "Suriname", code: "SR", dial_code: "+597" },
-        { name: "Uruguay", code: "UY", dial_code: "+598" },
-        { name: "Brunei", code: "BN", dial_code: "+673" },
-        { name: "Papua New Guinea", code: "PG", dial_code: "+675" },
-        { name: "Tonga", code: "TO", dial_code: "+676" },
-        { name: "Solomon Islands", code: "SB", dial_code: "+677" },
-        { name: "Vanuatu", code: "VU", dial_code: "+678" },
-        { name: "Fiji", code: "FJ", dial_code: "+679" },
-        { name: "Palau", code: "PW", dial_code: "+680" },
-        { name: "Samoa", code: "WS", dial_code: "+685" },
-        { name: "Kiribati", code: "KI", dial_code: "+686" },
-        { name: "Tuvalu", code: "TV", dial_code: "+688" },
-        { name: "Marshall Islands", code: "MH", dial_code: "+692" },
-        { name: "North Korea", code: "KP", dial_code: "+850" },
-        { name: "Hong Kong", code: "HK", dial_code: "+852" },
-        { name: "Macau", code: "MO", dial_code: "+853" },
-        { name: "Cambodia", code: "KH", dial_code: "+855" },
-        { name: "Laos", code: "LA", dial_code: "+856" },
-        { name: "Bangladesh", code: "BD", dial_code: "+880" },
-        { name: "Taiwan", code: "TW", dial_code: "+886" },
-        { name: "Maldives", code: "MV", dial_code: "+960" },
-        { name: "Lebanon", code: "LB", dial_code: "+961" },
-        { name: "Jordan", code: "JO", dial_code: "+962" },
-        { name: "Syria", code: "SY", dial_code: "+963" },
-        { name: "Iraq", code: "IQ", dial_code: "+964" },
-        { name: "Kuwait", code: "KW", dial_code: "+965" },
-        { name: "Saudi Arabia", code: "SA", dial_code: "+966" },
-        { name: "Yemen", code: "YE", dial_code: "+967" },
-        { name: "Oman", code: "OM", dial_code: "+968" },
-        { name: "United Arab Emirates", code: "AE", dial_code: "+971" },
-        { name: "Israel", code: "IL", dial_code: "+972" },
-        { name: "Bahrain", code: "BH", dial_code: "+973" },
-        { name: "Qatar", code: "QA", dial_code: "+974" },
-        { name: "Bhutan", code: "BT", dial_code: "+975" },
-        { name: "Mongolia", code: "MN", dial_code: "+976" },
-        { name: "Nepal", code: "NP", dial_code: "+977" },
-        { name: "Tajikistan", code: "TJ", dial_code: "+992" },
-        { name: "Turkmenistan", code: "TM", dial_code: "+993" },
-        { name: "Azerbaijan", code: "AZ", dial_code: "+994" },
-        { name: "Georgia", code: "GE", dial_code: "+995" },
-        { name: "Kyrgyzstan", code: "KG", dial_code: "+996" },
-        { name: "Uzbekistan", code: "UZ", dial_code: "+998" }
-    ].sort((a, b) => parseInt(a.dial_code.substring(1)) - parseInt(b.dial_code.substring(1)));
+        {"name": "Afghanistan", "dial_code": "+93", "code": "AF"},
+        {"name": "Aland Islands", "dial_code": "+358", "code": "AX"},
+        {"name": "Albania", "dial_code": "+355", "code": "AL"},
+        {"name": "Algeria", "dial_code": "+213", "code": "DZ"},
+        {"name": "AmericanSamoa", "dial_code": "+1684", "code": "AS"},
+        {"name": "Andorra", "dial_code": "+376", "code": "AD"},
+        {"name": "Angola", "dial_code": "+244", "code": "AO"},
+        {"name": "Anguilla", "dial_code": "+1264", "code": "AI"},
+        {"name": "Antarctica", "dial_code": "+672", "code": "AQ"},
+        {"name": "Antigua and Barbuda", "dial_code": "+1268", "code": "AG"},
+        {"name": "Argentina", "dial_code": "+54", "code": "AR"},
+        {"name": "Armenia", "dial_code": "+374", "code": "AM"},
+        {"name": "Aruba", "dial_code": "+297", "code": "AW"},
+        {"name": "Australia", "dial_code": "+61", "code": "AU"},
+        {"name": "Austria", "dial_code": "+43", "code": "AT"},
+        {"name": "Azerbaijan", "dial_code": "+994", "code": "AZ"},
+        {"name": "Bahamas", "dial_code": "+1242", "code": "BS"},
+        {"name": "Bahrain", "dial_code": "+973", "code": "BH"},
+        {"name": "Bangladesh", "dial_code": "+880", "code": "BD"},
+        {"name": "Barbados", "dial_code": "+1246", "code": "BB"},
+        {"name": "Belarus", "dial_code": "+375", "code": "BY"},
+        {"name": "Belgium", "dial_code": "+32", "code": "BE"},
+        {"name": "Belize", "dial_code": "+501", "code": "BZ"},
+        {"name": "Benin", "dial_code": "+229", "code": "BJ"},
+        {"name": "Bermuda", "dial_code": "+1441", "code": "BM"},
+        {"name": "Bhutan", "dial_code": "+975", "code": "BT"},
+        {"name": "Bolivia, Plurinational State of", "dial_code": "+591", "code": "BO"},
+        {"name": "Bosnia and Herzegovina", "dial_code": "+387", "code": "BA"},
+        {"name": "Botswana", "dial_code": "+267", "code": "BW"},
+        {"name": "Brazil", "dial_code": "+55", "code": "BR"},
+        {"name": "British Indian Ocean Territory", "dial_code": "+246", "code": "IO"},
+        {"name": "Brunei Darussalam", "dial_code": "+673", "code": "BN"},
+        {"name": "Bulgaria", "dial_code": "+359", "code": "BG"},
+        {"name": "Burkina Faso", "dial_code": "+226", "code": "BF"},
+        {"name": "Burundi", "dial_code": "+257", "code": "BI"},
+        {"name": "Cambodia", "dial_code": "+855", "code": "KH"},
+        {"name": "Cameroon", "dial_code": "+237", "code": "CM"},
+        {"name": "Canada", "dial_code": "+1", "code": "CA"},
+        {"name": "Cape Verde", "dial_code": "+238", "code": "CV"},
+        {"name": "Cayman Islands", "dial_code": "+1345", "code": "KY"},
+        {"name": "Central African Republic", "dial_code": "+236", "code": "CF"},
+        {"name": "Chad", "dial_code": "+235", "code": "TD"},
+        {"name": "Chile", "dial_code": "+56", "code": "CL"},
+        {"name": "China", "dial_code": "+86", "code": "CN"},
+        {"name": "Christmas Island", "dial_code": "+61", "code": "CX"},
+        {"name": "Cocos (Keeling) Islands", "dial_code": "+61", "code": "CC"},
+        {"name": "Colombia", "dial_code": "+57", "code": "CO"},
+        {"name": "Comoros", "dial_code": "+269", "code": "KM"},
+        {"name": "Congo", "dial_code": "+242", "code": "CG"},
+        {"name": "Congo, The Democratic Republic of the", "dial_code": "+243", "code": "CD"},
+        {"name": "Cook Islands", "dial_code": "+682", "code": "CK"},
+        {"name": "Costa Rica", "dial_code": "+506", "code": "CR"},
+        {"name": "Cote d'Ivoire", "dial_code": "+225", "code": "CI"},
+        {"name": "Croatia", "dial_code": "+385", "code": "HR"},
+        {"name": "Cuba", "dial_code": "+53", "code": "CU"},
+        {"name": "Cyprus", "dial_code": "+357", "code": "CY"},
+        {"name": "Czech Republic", "dial_code": "+420", "code": "CZ"},
+        {"name": "Denmark", "dial_code": "+45", "code": "DK"},
+        {"name": "Djibouti", "dial_code": "+253", "code": "DJ"},
+        {"name": "Dominica", "dial_code": "+1767", "code": "DM"},
+        {"name": "Dominican Republic", "dial_code": "+1849", "code": "DO"},
+        {"name": "Ecuador", "dial_code": "+593", "code": "EC"},
+        {"name": "Egypt", "dial_code": "+20", "code": "EG"},
+        {"name": "El Salvador", "dial_code": "+503", "code": "SV"},
+        {"name": "Equatorial Guinea", "dial_code": "+240", "code": "GQ"},
+        {"name": "Eritrea", "dial_code": "+291", "code": "ER"},
+        {"name": "Estonia", "dial_code": "+372", "code": "EE"},
+        {"name": "Ethiopia", "dial_code": "+251", "code": "ET"},
+        {"name": "Falkland Islands (Malvinas)", "dial_code": "+500", "code": "FK"},
+        {"name": "Faroe Islands", "dial_code": "+298", "code": "FO"},
+        {"name": "Fiji", "dial_code": "+679", "code": "FJ"},
+        {"name": "Finland", "dial_code": "+358", "code": "FI"},
+        {"name": "France", "dial_code": "+33", "code": "FR"},
+        {"name": "French Guiana", "dial_code": "+594", "code": "GF"},
+        {"name": "French Polynesia", "dial_code": "+689", "code": "PF"},
+        {"name": "Gabon", "dial_code": "+241", "code": "GA"},
+        {"name": "Gambia", "dial_code": "+220", "code": "GM"},
+        {"name": "Georgia", "dial_code": "+995", "code": "GE"},
+        {"name": "Germany", "dial_code": "+49", "code": "DE"},
+        {"name": "Ghana", "dial_code": "+233", "code": "GH"},
+        {"name": "Gibraltar", "dial_code": "+350", "code": "GI"},
+        {"name": "Greece", "dial_code": "+30", "code": "GR"},
+        {"name": "Greenland", "dial_code": "+299", "code": "GL"},
+        {"name": "Grenada", "dial_code": "+1473", "code": "GD"},
+        {"name": "Guadeloupe", "dial_code": "+590", "code": "GP"},
+        {"name": "Guam", "dial_code": "+1671", "code": "GU"},
+        {"name": "Guatemala", "dial_code": "+502", "code": "GT"},
+        {"name": "Guernsey", "dial_code": "+44", "code": "GG"},
+        {"name": "Guinea", "dial_code": "+224", "code": "GN"},
+        {"name": "Guinea-Bissau", "dial_code": "+245", "code": "GW"},
+        {"name": "Guyana", "dial_code": "+592", "code": "GY"},
+        {"name": "Haiti", "dial_code": "+509", "code": "HT"},
+        {"name": "Holy See (Vatican City State)", "dial_code": "+379", "code": "VA"},
+        {"name": "Honduras", "dial_code": "+504", "code": "HN"},
+        {"name": "Hong Kong", "dial_code": "+852", "code": "HK"},
+        {"name": "Hungary", "dial_code": "+36", "code": "HU"},
+        {"name": "Iceland", "dial_code": "+354", "code": "IS"},
+        {"name": "India", "dial_code": "+91", "code": "IN"},
+        {"name": "Indonesia", "dial_code": "+62", "code": "ID"},
+        {"name": "Iran, Islamic Republic of", "dial_code": "+98", "code": "IR"},
+        {"name": "Iraq", "dial_code": "+964", "code": "IQ"},
+        {"name": "Ireland", "dial_code": "+353", "code": "IE"},
+        {"name": "Isle of Man", "dial_code": "+44", "code": "IM"},
+        {"name": "Israel", "dial_code": "+972", "code": "IL"},
+        {"name": "Italy", "dial_code": "+39", "code": "IT"},
+        {"name": "Jamaica", "dial_code": "+1876", "code": "JM"},
+        {"name": "Japan", "dial_code": "+81", "code": "JP"},
+        {"name": "Jersey", "dial_code": "+44", "code": "JE"},
+        {"name": "Jordan", "dial_code": "+962", "code": "JO"},
+        {"name": "Kazakhstan", "dial_code": "+7", "code": "KZ"},
+        {"name": "Kenya", "dial_code": "+254", "code": "KE"},
+        {"name": "Kiribati", "dial_code": "+686", "code": "KI"},
+        {"name": "Korea, Democratic People's Republic of", "dial_code": "+850", "code": "KP"},
+        {"name": "Korea, Republic of", "dial_code": "+82", "code": "KR"},
+        {"name": "Kuwait", "dial_code": "+965", "code": "KW"},
+        {"name": "Kyrgyzstan", "dial_code": "+996", "code": "KG"},
+        {"name": "Lao People's Democratic Republic", "dial_code": "+856", "code": "LA"},
+        {"name": "Latvia", "dial_code": "+371", "code": "LV"},
+        {"name": "Lebanon", "dial_code": "+961", "code": "LB"},
+        {"name": "Lesotho", "dial_code": "+266", "code": "LS"},
+        {"name": "Liberia", "dial_code": "+231", "code": "LR"},
+        {"name": "Libyan Arab Jamahiriya", "dial_code": "+218", "code": "LY"},
+        {"name": "Liechtenstein", "dial_code": "+423", "code": "LI"},
+        {"name": "Lithuania", "dial_code": "+370", "code": "LT"},
+        {"name": "Luxembourg", "dial_code": "+352", "code": "LU"},
+        {"name": "Macao", "dial_code": "+853", "code": "MO"},
+        {"name": "Macedonia, The Former Yugoslav Republic of", "dial_code": "+389", "code": "MK"},
+        {"name": "Madagascar", "dial_code": "+261", "code": "MG"},
+        {"name": "Malawi", "dial_code": "+265", "code": "MW"},
+        {"name": "Malaysia", "dial_code": "+60", "code": "MY"},
+        {"name": "Maldives", "dial_code": "+960", "code": "MV"},
+        {"name": "Mali", "dial_code": "+223", "code": "ML"},
+        {"name": "Malta", "dial_code": "+356", "code": "MT"},
+        {"name": "Marshall Islands", "dial_code": "+692", "code": "MH"},
+        {"name": "Martinique", "dial_code": "+596", "code": "MQ"},
+        {"name": "Mauritania", "dial_code": "+222", "code": "MR"},
+        {"name": "Mauritius", "dial_code": "+230", "code": "MU"},
+        {"name": "Mayotte", "dial_code": "+262", "code": "YT"},
+        {"name": "Mexico", "dial_code": "+52", "code": "MX"},
+        {"name": "Micronesia, Federated States of", "dial_code": "+691", "code": "FM"},
+        {"name": "Moldova, Republic of", "dial_code": "+373", "code": "MD"},
+        {"name": "Monaco", "dial_code": "+377", "code": "MC"},
+        {"name": "Mongolia", "dial_code": "+976", "code": "MN"},
+        {"name": "Montenegro", "dial_code": "+382", "code": "ME"},
+        {"name": "Montserrat", "dial_code": "+1664", "code": "MS"},
+        {"name": "Morocco", "dial_code": "+212", "code": "MA"},
+        {"name": "Mozambique", "dial_code": "+258", "code": "MZ"},
+        {"name": "Myanmar", "dial_code": "+95", "code": "MM"},
+        {"name": "Namibia", "dial_code": "+264", "code": "NA"},
+        {"name": "Nauru", "dial_code": "+674", "code": "NR"},
+        {"name": "Nepal", "dial_code": "+977", "code": "NP"},
+        {"name": "Netherlands", "dial_code": "+31", "code": "NL"},
+        {"name": "Netherlands Antilles", "dial_code": "+599", "code": "AN"},
+        {"name": "New Caledonia", "dial_code": "+687", "code": "NC"},
+        {"name": "New Zealand", "dial_code": "+64", "code": "NZ"},
+        {"name": "Nicaragua", "dial_code": "+505", "code": "NI"},
+        {"name": "Niger", "dial_code": "+227", "code": "NE"},
+        {"name": "Nigeria", "dial_code": "+234", "code": "NG"},
+        {"name": "Niue", "dial_code": "+683", "code": "NU"},
+        {"name": "Norfolk Island", "dial_code": "+672", "code": "NF"},
+        {"name": "Northern Mariana Islands", "dial_code": "+1670", "code": "MP"},
+        {"name": "Norway", "dial_code": "+47", "code": "NO"},
+        {"name": "Oman", "dial_code": "+968", "code": "OM"},
+        {"name": "Pakistan", "dial_code": "+92", "code": "PK"},
+        {"name": "Palau", "dial_code": "+680", "code": "PW"},
+        {"name": "Palestinian Territory, Occupied", "dial_code": "+970", "code": "PS"},
+        {"name": "Panama", "dial_code": "+507", "code": "PA"},
+        {"name": "Papua New Guinea", "dial_code": "+675", "code": "PG"},
+        {"name": "Paraguay", "dial_code": "+595", "code": "PY"},
+        {"name": "Peru", "dial_code": "+51", "code": "PE"},
+        {"name": "Philippines", "dial_code": "+63", "code": "PH"},
+        {"name": "Pitcairn", "dial_code": "+872", "code": "PN"},
+        {"name": "Poland", "dial_code": "+48", "code": "PL"},
+        {"name": "Portugal", "dial_code": "+351", "code": "PT"},
+        {"name": "Puerto Rico", "dial_code": "+1939", "code": "PR"},
+        {"name": "Qatar", "dial_code": "+974", "code": "QA"},
+        {"name": "Romania", "dial_code": "+40", "code": "RO"},
+        {"name": "Russia", "dial_code": "+7", "code": "RU"},
+        {"name": "Rwanda", "dial_code": "+250", "code": "RW"},
+        {"name": "Reunion", "dial_code": "+262", "code": "RE"},
+        {"name": "Saint Barthelemy", "dial_code": "+590", "code": "BL"},
+        {"name": "Saint Helena, Ascension and Tristan Da Cunha", "dial_code": "+290", "code": "SH"},
+        {"name": "Saint Kitts and Nevis", "dial_code": "+1869", "code": "KN"},
+        {"name": "Saint Lucia", "dial_code": "+1758", "code": "LC"},
+        {"name": "Saint Martin", "dial_code": "+590", "code": "MF"},
+        {"name": "Saint Pierre and Miquelon", "dial_code": "+508", "code": "PM"},
+        {"name": "Saint Vincent and the Grenadines", "dial_code": "+1784", "code": "VC"},
+        {"name": "Samoa", "dial_code": "+685", "code": "WS"},
+        {"name": "San Marino", "dial_code": "+378", "code": "SM"},
+        {"name": "Sao Tome and Principe", "dial_code": "+239", "code": "ST"},
+        {"name": "Saudi Arabia", "dial_code": "+966", "code": "SA"},
+        {"name": "Senegal", "dial_code": "+221", "code": "SN"},
+        {"name": "Serbia", "dial_code": "+381", "code": "RS"},
+        {"name": "Seychelles", "dial_code": "+248", "code": "SC"},
+        {"name": "Sierra Leone", "dial_code": "+232", "code": "SL"},
+        {"name": "Singapore", "dial_code": "+65", "code": "SG"},
+        {"name": "Slovakia", "dial_code": "+421", "code": "SK"},
+        {"name": "Slovenia", "dial_code": "+386", "code": "SI"},
+        {"name": "Solomon Islands", "dial_code": "+677", "code": "SB"},
+        {"name": "Somalia", "dial_code": "+252", "code": "SO"},
+        {"name": "South Africa", "dial_code": "+27", "code": "ZA"},
+        {"name": "South Sudan", "dial_code": "+211", "code": "SS"},
+        {"name": "Spain", "dial_code": "+34", "code": "ES"},
+        {"name": "Sri Lanka", "dial_code": "+94", "code": "LK"},
+        {"name": "Sudan", "dial_code": "+249", "code": "SD"},
+        {"name": "Suriname", "dial_code": "+597", "code": "SR"},
+        {"name": "Svalbard and Jan Mayen", "dial_code": "+47", "code": "SJ"},
+        {"name": "Swaziland", "dial_code": "+268", "code": "SZ"},
+        {"name": "Sweden", "dial_code": "+46", "code": "SE"},
+        {"name": "Switzerland", "dial_code": "+41", "code": "CH"},
+        {"name": "Syrian Arab Republic", "dial_code": "+963", "code": "SY"},
+        {"name": "Taiwan, Province of China", "dial_code": "+886", "code": "TW"},
+        {"name": "Tajikistan", "dial_code": "+992", "code": "TJ"},
+        {"name": "Tanzania, United Republic of", "dial_code": "+255", "code": "TZ"},
+        {"name": "Thailand", "dial_code": "+66", "code": "TH"},
+        {"name": "Timor-Leste", "dial_code": "+670", "code": "TL"},
+        {"name": "Togo", "dial_code": "+228", "code": "TG"},
+        {"name": "Tokelau", "dial_code": "+690", "code": "TK"},
+        {"name": "Tonga", "dial_code": "+676", "code": "TO"},
+        {"name": "Trinidad and Tobago", "dial_code": "+1868", "code": "TT"},
+        {"name": "Tunisia", "dial_code": "+216", "code": "TN"},
+        {"name": "Turkey", "dial_code": "+90", "code": "TR"},
+        {"name": "Turkmenistan", "dial_code": "+993", "code": "TM"},
+        {"name": "Turks and Caicos Islands", "dial_code": "+1649", "code": "TC"},
+        {"name": "Tuvalu", "dial_code": "+688", "code": "TV"},
+        {"name": "Uganda", "dial_code": "+256", "code": "UG"},
+        {"name": "Ukraine", "dial_code": "+380", "code": "UA"},
+        {"name": "United Arab Emirates", "dial_code": "+971", "code": "AE"},
+        {"name": "United Kingdom", "dial_code": "+44", "code": "GB"},
+        {"name": "United States", "dial_code": "+1", "code": "US"},
+        {"name": "Uruguay", "dial_code": "+598", "code": "UY"},
+        {"name": "Uzbekistan", "dial_code": "+998", "code": "UZ"},
+        {"name": "Vanuatu", "dial_code": "+678", "code": "VU"},
+        {"name": "Venezuela, Bolivarian Republic of", "dial_code": "+58", "code": "VE"},
+        {"name": "Viet Nam", "dial_code": "+84", "code": "VN"},
+        {"name": "Virgin Islands, British", "dial_code": "+1284", "code": "VG"},
+        {"name": "Virgin Islands, U.S.", "dial_code": "+1340", "code": "VI"},
+        {"name": "Wallis and Futuna", "dial_code": "+681", "code": "WF"},
+        {"name": "Yemen", "dial_code": "+967", "code": "YE"},
+        {"name": "Zambia", "dial_code": "+260", "code": "ZM"},
+        {"name": "Zimbabwe", "dial_code": "+263", "code": "ZW"}
+    ].map(country => ({...country, dial_code: country.dial_code.replace(/\s/g, '')}))
+     .sort((a, b) => parseInt(a.dial_code.substring(1)) - parseInt(b.dial_code.substring(1)));
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
+    // Effect to close the dropdown when clicking outside of it.
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -257,7 +334,7 @@ const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, se
                     </div>
                     <input type="text" placeholder="Date of Birth" onFocus={(e) => e.target.type='date'} onBlur={(e) => { if(!e.target.value) e.target.type='text'}} value={dob} onChange={e => setDob(e.target.value)} className="w-full px-4 py-3 bg-white border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700" required />
                     <div className="flex">
-                        <div className="relative w-1/4" ref={dropdownRef}>
+                        <div className="relative w-1/3" ref={dropdownRef}>
                             <button
                                 type="button"
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -301,15 +378,19 @@ const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, se
     )
 };
 
-// CORRECTED: Added 'user' prop to the function definition
+/**
+ * Component for the file upload screen.
+ */
 const UploadScreen = ({ user, handleLogout, handleFileUpload }) => {
     const handleDragOver = (e) => e.preventDefault();
     const handleDrop = (e) => { e.preventDefault(); if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]); };
     const handleFileSelect = (e) => { if (e.target.files.length > 0) handleFileUpload(e.target.files[0]); };
     return (
         <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-lg border border-gray-100 max-w-2xl w-full" style={{ backgroundColor: '#F9F5FF' }}>
-            {/* CORRECTED: Changed h2 to display a welcome message using the 'user' prop */}
-            <div className="flex justify-between items-center mb-6"> <h2 className="text-3xl font-bold text-purple-800">Welcome, {user?.firstName}!</h2> <button onClick={handleLogout} className="text-purple-600 hover:text-purple-800 font-semibold">Sign Out</button> </div>
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold text-purple-800">Welcome, {user?.firstName}!</h2>
+                <button onClick={handleLogout} className="text-purple-600 hover:text-purple-800 font-semibold">Sign Out</button>
+            </div>
             <p className="text-purple-600 mb-8">Don't stress! Just upload your notice and we'll make sense of it for you.</p>
             <div className="border-2 border-dashed border-purple-300 rounded-xl p-12 text-center bg-purple-50 cursor-pointer hover:bg-purple-100 transition-colors" onDragOver={handleDragOver} onDrop={handleDrop} onClick={() => document.getElementById('file-input').click()}>
                 <FileHeart className="mx-auto h-16 w-16 text-purple-400" />
@@ -322,6 +403,9 @@ const UploadScreen = ({ user, handleLogout, handleFileUpload }) => {
     );
 };
 
+/**
+ * Component to display the summarized tax notice data.
+ */
 const SummaryScreen = ({ summaryData, resetApp }) => (
     <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-lg border border-gray-100 max-w-3xl w-full" style={{ backgroundColor: '#F9F5FF' }}>
         <h1 className="text-3xl font-bold text-purple-800 mb-2 text-center">Summary of Your IRS Notice {summaryData.noticeType}</h1>
@@ -432,9 +516,13 @@ const SummaryScreen = ({ summaryData, resetApp }) => (
 
 // --- Main Application Component ---
 export default function App() {
+    // State for managing the current view (e.g., 'login', 'upload')
     const [view, setView] = useState('login');
+    // State for storing the logged-in user's data
     const [user, setUser] = useState(null);
+    // State for displaying error messages
     const [error, setError] = useState('');
+    // Form field states
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -443,34 +531,51 @@ export default function App() {
     const [dob, setDob] = useState('');
     const [countryCode, setCountryCode] = useState('+1');
     const [mobileNumber, setMobileNumber] = useState('');
+    // State to hold the summary data from the API
     const [summaryData, setSummaryData] = useState(null);
 
+    // Clears all form fields and errors, typically when switching views.
     const clearFormFields = () => {
         setEmail(''); setPassword(''); setConfirmPassword('');
         setFirstName(''); setLastName(''); setError('');
         setDob(''); setMobileNumber(''); setCountryCode('+1');
     };
 
+    // Handles the registration form submission.
     const handleRegister = async (e) => {
         e.preventDefault();
         setError('');
         if (password !== confirmPassword) { setError("Passwords do not match."); return; }
         const fullMobileNumber = `${countryCode}${mobileNumber}`;
         const result = await api.register({ firstName, lastName, email, password, dob, mobileNumber: fullMobileNumber });
-        if (result.success) { setUser(result.user); setView('upload'); } 
-        else { setError(result.message); }
+        if (result.success) {
+            setUser(result.user);
+            setView('upload');
+        } else {
+            setError(result.message);
+        }
     };
 
+    // Handles the login form submission.
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
         const result = await api.login({ email, password });
-        if (result.success) { setUser(result.user); setView('upload'); }
-        else { setError(result.message); }
+        if (result.success) {
+            setUser(result.user);
+            setView('upload');
+        } else {
+            setError(result.message);
+        }
     };
 
-    const handleLogout = () => { setUser(null); setView('login'); };
+    // Logs the user out and returns to the login screen.
+    const handleLogout = () => {
+        setUser(null);
+        setView('login');
+    };
     
+    // Handles the file upload and initiates the analysis process.
     const handleFileUpload = async (file) => {
         if (file) {
             setView('analyzing');
@@ -491,22 +596,33 @@ export default function App() {
         }
     };
 
-    const resetApp = () => { setView('upload'); setSummaryData(null); };
+    // Resets the app to the upload screen to analyze another document.
+    const resetApp = () => {
+        setView('upload');
+        setSummaryData(null);
+    };
 
+    // Renders the current view based on the 'view' state.
     const renderView = () => {
         switch (view) {
-            case 'register': return <AuthScreen isLogin={false} handleRegister={handleRegister} error={error} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} email={email} setEmail={setEmail} password={password} setPassword={setPassword} confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword} dob={dob} setDob={setDob} mobileNumber={mobileNumber} setMobileNumber={setMobileNumber} countryCode={countryCode} setCountryCode={setCountryCode} setView={setView} clearFormFields={clearFormFields} />;
-            case 'login': return <AuthScreen isLogin={true} handleLogin={handleLogin} error={error} email={email} setEmail={setEmail} password={password} setPassword={setPassword} setView={setView} clearFormFields={clearFormFields} />;
+            case 'register':
+                return <AuthScreen isLogin={false} handleRegister={handleRegister} error={error} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} email={email} setEmail={setEmail} password={password} setPassword={setPassword} confirmPassword={confirmPassword} setConfirmPassword={setConfirmPassword} dob={dob} setDob={setDob} mobileNumber={mobileNumber} setMobileNumber={setMobileNumber} countryCode={countryCode} setCountryCode={setCountryCode} setView={setView} clearFormFields={clearFormFields} />;
+            case 'login':
+                return <AuthScreen isLogin={true} handleLogin={handleLogin} error={error} email={email} setEmail={setEmail} password={password} setPassword={setPassword} setView={setView} clearFormFields={clearFormFields} />;
             
-            // CORRECTED: Pass the 'user' object to the UploadScreen component
-            case 'upload': return <UploadScreen user={user} handleLogout={handleLogout} handleFileUpload={handleFileUpload} />;
+            case 'upload':
+                return <UploadScreen user={user} handleLogout={handleLogout} handleFileUpload={handleFileUpload} />;
             
-            case 'analyzing': return <LoadingSpinner />;
-            case 'summary': return <SummaryScreen summaryData={summaryData} resetApp={resetApp} />;
-            default: return <div className="text-purple-500">Loading...</div>;
+            case 'analyzing':
+                return <LoadingSpinner />;
+            case 'summary':
+                return <SummaryScreen summaryData={summaryData} resetApp={resetApp} />;
+            default:
+                return <div className="text-purple-500">Loading...</div>;
         }
     };
 
+    // Main component render method.
     return (
         <div className="min-h-screen bg-purple-100 flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, #EDE9FE, #F3E8FF)'}}>
             {renderView()}
