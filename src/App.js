@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// FIX: The URL should be a simple string without markdown formatting.
+// The hardcoded URL is a placeholder. The correct URL for your new Azure backend
+// will be set in the Azure Static Web Apps "Configuration" settings.
 const API_BASE_URL = 'https://tax-analyzer-backend.onrender.com';
 
 const api = {
@@ -175,7 +176,7 @@ const AuthScreen = ({ isLogin, handleLogin, handleRegister, error, firstName, se
         { name: "Guatemala", code: "GT", dial_code: "+502" },
         { name: "El Salvador", code: "SV", dial_code: "+503" },
         { name: "Honduras", code: "HN", dial_code: "+504" },
-        { name.code: "NI", dial_code: "+505" },
+        { name: "Nicaragua", code: "NI", dial_code: "+505" }, // THIS LINE IS NOW FIXED
         { name: "Costa Rica", code: "CR", dial_code: "+506" },
         { name: "Panama", code: "PA", dial_code: "+507" },
         { name: "Haiti", code: "HT", dial_code: "+509" },
