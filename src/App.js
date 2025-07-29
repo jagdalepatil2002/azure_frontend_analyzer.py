@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-// The hardcoded URL is a placeholder. The correct URL for your new Azure backend
-// will be set in the Azure Static Web Apps "Configuration" settings.
-const API_BASE_URL = 'https://tax-analyzer-backend.onrender.com';
+// FIX: The API URL is now dynamically read from a React environment variable.
+// This is more secure and flexible than hardcoding the URL.
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://tax-analyzer-backend.onrender.com';
 
 /**
  * API object for handling all fetch requests to the backend.
