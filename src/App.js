@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 
 // FIX: The API URL is now dynamically read from a React environment variable.
 // This is more secure and flexible than hardcoding the URL.
-const API_BASE_URL = 'tax-analyzer-backend-fph0guf5bwdufvhe.centralus-01.azurewebsites.net';
+const API_BASE_URL = 'https://web-production-21f8.up.railway.app/';
 
 /**
  * API object for handling all fetch requests to the backend.
