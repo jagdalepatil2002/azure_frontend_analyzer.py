@@ -527,7 +527,7 @@ const DashboardScreen = ({ user, handleLogout, setView, setSummaryData }) => {
             <header className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-black">Dashboard</h1>
-                    <p className="text-slate-500">Welcome back, {user?.firstName}!</p>
+                    <p className="text-slate-500">Welcome back, {user?.firstName} {user?.lastName}!</p>
                 </div>
                 <div className="space-x-4">
                     <button onClick={() => setIsProfileModalOpen(true)} className="text-slate-500 hover:text-black font-semibold transition-colors">Profile</button>
@@ -568,9 +568,11 @@ const DashboardScreen = ({ user, handleLogout, setView, setSummaryData }) => {
             </main>
             <Modal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} title="My Profile">
                 <div className="space-y-2">
-                    <p><strong>Name:</strong> {user?.firstName}</p>
+                    <p><strong>Full Name:</strong> {user?.firstName} {user?.lastName}</p>
                     <p><strong>Email:</strong> {user?.email}</p>
-                    <p className="text-sm text-slate-500 pt-4">Profile editing is not yet available.</p>
+                    <p><strong>Date of Birth:</strong> {user?.dob || 'Not available'}</p>
+                    <p><strong>Mobile Number:</strong> {user?.mobileNumber || 'Not available'}</p>
+                    <p className="text-sm text-slate-500 pt-4">Profile editing is not yet available. Full details are shown for the current session after registration.</p>
                 </div>
             </Modal>
         </div>
@@ -667,18 +669,70 @@ ${summaryData.whyText}
         document.body.removeChild(link);
     };
 
-    const taxpayerEmailContent = `Subject: Important: IRS Notice ${summaryData.noticeType} - Action Required...`;
-    const irsResponseContent = `Internal Revenue Service...`;
+    const taxpayerEmailContent = `Subject: Important: IRS Notice ${summaryData.noticeType} - Action Required
+
+Dear [Taxpayer Name],
+
+This is a follow-up regarding the IRS Notice ${summaryData.noticeType} for the tax year ending ${summaryData.taxYear || '[Tax Year]'}.
+
+Key Details:
+- Notice Type: ${summaryData.noticeType}
+- Amount Due: ${summaryData.amountDue}
+- Payment Deadline: ${summaryData.payBy}
+
+This notice indicates an outstanding issue that requires your attention. Please review the analysis we've prepared. It's important to take action by the deadline to avoid further penalties or interest.
+
+If you have any questions, please let me know.
+
+Best regards,
+[Your Name]`;
+
+    const irsResponseContent = `Internal Revenue Service
+[IRS Processing Center Address from Notice]
+
+Re: Response to Notice ${summaryData.noticeType}
+Taxpayer(s): ${summaryData.noticeFor}
+SSN: ${summaryData.ssn}
+Tax Year: ${summaryData.taxYear || '[Tax Year]'}
+
+Dear IRS Representative,
+
+I am writing in response to the notice referenced above, dated [Date on Notice].
+
+[Choose one of the following options and delete the others]
+
+Option 1: Payment Enclosed
+Please find enclosed full payment for the amount due of ${summaryData.amountDue}.
+
+Option 2: Request for Installment Agreement
+I am unable to pay the full amount at this time and would like to request an installment agreement. Please send me the necessary information.
+
+Option 3: Disputing the Notice
+I am disputing the findings of this notice. My reasons are as follows: [Clearly state your reasons, e.g., a payment was already made on DATE, the income calculation is incorrect, etc.]. I have enclosed copies of the following documents to support my position: [List documents, e.g., bank statements, corrected forms, etc.].
+
+Thank you for your attention to this matter.
+
+Sincerely,
+
+${summaryData.noticeFor}
+[Your Phone Number]
+[Your Address]`;
 
     return (
         <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100 max-w-4xl w-full animate-fade-in">
             <h1 className="text-3xl font-bold text-black mb-2 text-center">Summary of Your IRS Notice</h1>
             <p className="text-slate-500 text-center mb-6">Notice Type: <span className="font-semibold text-black">{summaryData.noticeType}</span></p>
 
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
+                <p className="font-semibold text-black">Notice For: {summaryData.noticeFor}</p>
+                <p className="text-slate-600 whitespace-pre-wrap">{summaryData.address}</p>
+                <p className="text-slate-600">SSN: {summaryData.ssn}</p>
+            </div>
+
             <div className="grid md:grid-cols-2 gap-4 mb-8">
                 <div className="p-6 rounded-xl border-2 border-slate-200 text-center">
                     <p className="text-sm text-slate-500 uppercase font-semibold tracking-wider">Amount Due</p>
-                    <p className="text-4xl font-bold text-black mt-1">{summaryData.amountDue || 'N/A'}</p>
+                    <p className="text-4xl font-bold text-orange-500 mt-1">{summaryData.amountDue || 'N/A'}</p>
                 </div>
                 <div className={`p-6 rounded-xl border-2 text-center ${isPastDue() ? 'border-red-300 bg-red-50' : 'border-slate-200'}`}>
                     <p className={`text-sm uppercase font-semibold tracking-wider ${isPastDue() ? 'text-red-600' : 'text-slate-500'}`}>Pay By</p>
@@ -816,7 +870,16 @@ export default function App() {
         }
         const result = await api.register(formData);
         if (result.success) {
-            setUser(result.user);
+            // FIX: Create a complete user object from form data and server response
+            const fullUser = {
+                id: result.user.id,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                dob: formData.dob,
+                mobileNumber: `${formData.countryCode}${formData.mobileNumber}`
+            };
+            setUser(fullUser);
             setView('dashboard');
         } else {
             setError(result.message);
