@@ -288,7 +288,9 @@ const DashboardScreen = ({ user, handleLogout, history, handleHistoryClick, hand
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-center text-slate-500 mt-10">No past analyses found. Upload a PDF to begin.</p>
+                            <div className="flex items-center justify-center h-full">
+                                <p className="text-center text-slate-500">No past analyses found. Upload a PDF to begin.</p>
+                            </div>
                         )}
                     </div>
                 </section>
