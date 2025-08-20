@@ -270,9 +270,9 @@ const DashboardScreen = ({ user, handleLogout, history, handleHistoryClick, hand
                 </section>
                 
                 {/* History Section */}
-                <section>
+                <section className="flex flex-col">
                     <h2 className="text-xl font-bold text-black mb-4">Analysis History</h2>
-                    <div className="bg-white p-6 rounded-xl border-2 border-slate-200 h-full">
+                    <div className="bg-white p-6 rounded-xl border-2 border-slate-200 flex-grow">
                         {history.length > 0 ? (
                             <ul className="space-y-3">
                                 {history.map(item => (
@@ -288,7 +288,9 @@ const DashboardScreen = ({ user, handleLogout, history, handleHistoryClick, hand
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-center text-slate-500 mt-10">No past analyses found. Upload a PDF to begin.</p>
+                            <div className="flex items-center justify-center h-full">
+                                <p className="text-center text-slate-500">No past analyses found. Upload a PDF to begin.</p>
+                            </div>
                         )}
                     </div>
                 </section>
